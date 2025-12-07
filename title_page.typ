@@ -1,5 +1,5 @@
+#let cve = "CVE-2016-5195"
 #let title = "Studienarbeit über die Schwachstelle"
-#let subtitle = "CVE-"
 #let course = "IT-Sicherheit"
 #let university = "Hochschule Hof"
 #let date= datetime.today()
@@ -27,7 +27,7 @@
   *#title*
 
   #set text(size: 24pt)
-  *#subtitle*
+  *#cve*
 
   #v(0.75cm)
 
@@ -50,7 +50,7 @@
 
   #v(2cm)
 
-  #text(size: 12pt, weight: "bold")[Zusammenfassung]
+  #text(size: 12pt, weight: "bold")[Abstract]
 
 
   #v(0.3cm)

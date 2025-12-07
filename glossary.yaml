@@ -1,0 +1,11 @@
+# all descriptions are not written by me
+cow:
+  short: COW
+  article: an
+  long: Copy-on-Write
+  # todo: rewrite: https://www.graphapp.ai/engineering-glossary/containerization-orchestration/copy-on-write-cow
+  description: is a resource management technique used in container storage. It allows multiple containers to share the same base filesystem layers, only copying data when modifications are made. CoW significantly reduces storage usage and improves container startup times.
+cve:
+  short: CVE
+  long: Common Vulnerabilities and Exposures
+  description: is a system that provides a standardized method for identifying and cataloging publicly known cybersecurity vulnerabilities in software and hardware. Each vulnerability is assigned a unique identifier, known as a CVE ID, which helps organizations communicate and manage security issues effectively.
