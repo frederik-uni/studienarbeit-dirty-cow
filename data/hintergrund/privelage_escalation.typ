@@ -1,2 +1,4 @@
-== lokale Privilegieneskalation
-#lorem(150)
+== Privilegieneskalation
+Privilegieneskalation bezeichnet den Vorgang, bei dem ein Angreifer unberechtigterweise höhere Zugriffsrechte innerhalb eines Systems erlangt. Der Prozess beginnt typischerweise mit der Kompromittierung eines initialen, eingeschränkten Kontos, etwa durch Phishing, den Einsatz von Schadsoftware oder das Erraten von Zugangsdaten. Auf dieser Grundlage verfolgt der Angreifer das Ziel, seine Berechtigungen schrittweise bis hin zu administrativen bzw. Root Rechten auszuweiten @privilege_escalation.
+
+Die lokale Privilegieneskalation beschreibt Szenarien, in denen ein Angreifer bereits einen begrenzten Zugriff auf ein Endgerät besitzt und vorhandene Schwachstellen im Betriebssystem oder in lokal ausgeführten Diensten ausnutzt, um seine Rechte weiter zu erhöhen. Ein solcher lokaler Zugriff kann beispielsweise durch die Ausführung von Schadsoftware, durch erfolgreiche Code-Injection-Angriffe(Webserver Exploit) oder anderen lokal betriebenen Anwendungen erreicht werden.
