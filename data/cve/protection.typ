@@ -6,3 +6,40 @@ Im Write Fault wird nun überprüft:
 - ob der zugehörige Page Table Entry (PTE) als „dirty“ markiert ist.
 
 Basierend auf diesen Prüfungen wird entschieden, ob der Speicherbereich invalidiert werden muss. In diesem Fall wird ein erneuter Page Fault ausgelöst (Retry), wodurch eine erneute und korrekte Überprüfung der Zugriffsrechte sichergestellt wird. Dadurch wird verhindert, dass Schreiboperationen auf Shared Pages ohne explizite Schreibberechtigung durchgeführt werden können.
+
+Die Logik für die Überprüfung des COW-Zustands wurde in eine separate Funktion ausgelagert, um den Code besser lesbar und wartbar zu gestalten wie in @figure1 zu sehen.
+
+#figure([
+```c
+/*
+ * FOLL_FORCE can write to even unwritable pte's, but only
+ * after we've gone through a COW cycle and they are dirty.
+ */
+static inline bool can_follow_write_pte(pte_t pte, unsigned int flags) {
+	return pte_write(pte) ||
+		((flags & FOLL_FORCE) && (flags & FOLL_COW) && pte_dirty(pte));
+}
+```
+], caption: "mm/gup.c") <figure1>
+
+Statt nur write Permissions zu überprüfen wird write oder FOLL_COW + pte_dirty überprüft.
+
+#figure([
+```diff
+if ((flags & FOLL_NUMA) && pte_protnone(pte)) goto no_page;
+- if ((flags & FOLL_WRITE) && !pte_write(pte)) {
++ if ((flags & FOLL_WRITE) && !can_follow_write_pte(pte, flags)) {
+    pte_unmap_unlock(ptep, ptl);
+    return NULL;
+}
+```
+], caption: "mm/gup.c updated retry")
+
+Dies ist der Ursprung des Bugs. Hier wurde ursprünglich FOLL_WRITE entfernt. Statt FOLL_WRITE zu entfernen überprüfen wir nun ob wir uns in einer COW-Page befinden in dem letzten write fault.
+#figure([
+```diff
+if ((ret & VM_FAULT_WRITE) && !(vma->vm_flags & VM_WRITE))
+- *flags &= ~FOLL_WRITE;
++ *flags |= FOLL_COW;
+```
+], caption: "mm/gup.c updated flags")
