@@ -6,12 +6,12 @@
 
 
 #set par(
-  spacing: 1.5em,
+  spacing: 1.2em,
   leading: 1.2 * 11pt,
   justify: true,
 )
 
-#set text(font: "Arial", lang:"de", size: 11pt)
+#set text(font: "Arial", lang:"de", size: 12pt)
 
 #outline(title: "Inhaltsverzeichnis")
 #pagebreak()
