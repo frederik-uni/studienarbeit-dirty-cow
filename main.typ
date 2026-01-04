@@ -56,5 +56,6 @@
 
 = Verwandte Arbeiten
 = Fazit
+#include("data/fazit.typ")
 
 #bibliography("refs.bib", title: "Literatur")
