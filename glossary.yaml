@@ -9,3 +9,13 @@ cve:
   short: CVE
   long: Common Vulnerabilities and Exposures
   description: is a system that provides a standardized method for identifying and cataloging publicly known cybersecurity vulnerabilities in software and hardware. Each vulnerability is assigned a unique identifier, known as a CVE ID, which helps organizations communicate and manage security issues effectively.
+ram:
+  short: RAM
+  article: the
+  long: Random Access Memory
+  description: is the computer’s primary volatile working memory used to store data and instructions that the CPU needs in the short term. RAM enables fast read/write access for running programs and active processes; its contents are lost when power is removed.
+ssh:
+  short: SSH
+  article: the
+  long: Secure Shell
+  description: is a cryptographic network protocol for secure remote access and management of systems over an insecure network. SSH provides encrypted communication, strong authentication (e.g., keys or passwords), and supports functions such as remote command execution, file transfer, and port forwarding.
