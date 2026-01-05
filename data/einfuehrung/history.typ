@@ -1,3 +1,5 @@
+#import "@preview/wrap-it:0.1.1"
+
 * 1.2 Warum ist das relevant ?*
 
 #let w = 2.2in
@@ -5,7 +7,7 @@
 
 Entgegen anderen üblichen Schwachstellen befindet sich diese auf Kernel-Ebene und betrifft damit das gesamte System anstelle einer einzelnen Anwendung. Der Grad der Auswirkung ist als sehr hoch einzustufen, da ein potenzieller Angreifer im Rahmen einer lokalen Privilegieneskalation die Kontrolle über Daten und Prozesse des Systems erlangen kann @relevant.
 
-Besonders gravierend ist hierbei die hohe Verbreitung von Linux im Bereich Serverinfrastrukturen, wodurch sich das Schadenspotenzial von einem einzelnen System auf ein gesamtes Netzwerk ausweiten kann @linux_os. 
+Besonders gravierend ist hierbei die hohe Verbreitung von Linux im Bereich Serverinfrastrukturen, wodurch sich das Schadenspotenzial von einem einzelnen System auf ein gesamtes Netzwerk ausweiten kann @linux_os.
 
 Hinsichtlich des Angriffswegs ist dieser als praxisnah zu bewerten, da bereits ein bestehender SSH-Zugang sh. @fig:ssh-logo ausreicht, um den Exploit auf dem Zielsystem auszuführen und so eine Übernahme mit erweiterten Rechten zu ermöglichen.
 
@@ -16,7 +18,7 @@ Hinsichtlich des Angriffswegs ist dieser als praxisnah zu bewerten, da bereits e
   ) <fig:ssh-logo>
 ]
 
-#wrap-content(
+#wrap-it.wrap-content(
   box(ssh_fig, inset: 0.25em),
   [
     Die Schwere der Schwachstelle wird zudem durch die drei IT-Sicherheitsziele untermauert:
