@@ -10,7 +10,7 @@ void *map = mmap(NULL, st.st_size, PROT_READ, MAP_PRIVATE, f, 0);
 ], caption: [mappen der Datei],
 ) \
 
-Der Exploit basiert auf dem gleichzeitigen Ausführen zweier Operationen:
+Der Exploit basiert auf dem gleichzeitigen Ausführen zweier Operationen. Zur Erhöhung der Eintrittswahrscheinlichkeit dieses Zustands werden zwei Threads gestartet, die die beiden betreffenden Operationen wiederholt ausführen.:
 1.	Schreibzugriff auf eine gemappte Pseudo-Datei
 Hierbei wird eine Datei mittels mmap() in den Speicher gemappt, obwohl sie lediglich über Leserechte verfügt. Die Verwendung einer Pseudo-Datei erlaubt es, bestimmte Sicherheitsprüfungen zu umgehen und gezielt Page Faults auszulösen, welche eine COW-Page erzeugen und beschreiben.
 #figure([
