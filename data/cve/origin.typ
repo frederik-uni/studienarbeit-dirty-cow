@@ -4,7 +4,7 @@ Die Analyse konzentriert sich primär auf eine annotierte Ablaufbeschreibung ein
 Der Angriff basiert auf einer spezifischen Abfolge von Page Faults:
 1.	Erster Page Fault
 #block(inset: (left: 2em))[
-  Der Fault wird mit den Flags FOLL_WRITE und FOLL_FORCE ausgelöst, durch einen Schreib Versuch. Da weder eine COW-Seite existiert noch Schreibrechte vorliegen, wird eine COW-Seite erzeugt. Der interne Status wird auf read-only gesetzt, was einen weiteren Page Fault auslöst, der versucht, Schreibrechte zu erlangen.
+  Der Fault wird mit den Flags FOLL_WRITE und FOLL_FORCE ausgelöst, durch einen Schreibversuch. Da weder eine COW-Seite existiert noch Schreibrechte vorliegen, wird eine eine private anonyme Kopie der Page vorbereitet. Der interne Status wird auf read-only gesetzt, was einen weiteren Page Fault auslöst, der versucht, Schreibrechte zu erlangen.
   #figure([
 ```
 faultin_page
@@ -52,7 +52,7 @@ faultin_page
 
 4.	Letzter Page Fault (Read Fault)
 #block(inset: (left: 2em))[
-  Die zuvor benötigte Schreibberechtigung wurde intern entfernt. Es wird nur überprüft, ob ein read möglich ist und die pagecache page wird zurückgegeben, die nun beschrieben werden kann. Erfolgt nun zwischen diesem und dem vorherigen Fault ein madvise()-Aufruf, wird die page table zurückgesetzt und zeigt nun auf die Shared-Page. Der Kernel behandelt den Zugriff als reinen Lesezugriff und überspringt die Schreibrechteprüfung vollständig.
+  Die zuvor benötigte Schreibberechtigung wurde intern entfernt. Es wird nur überprüft, ob ein read möglich ist und die Page-Cache-Seite wird zurückgegeben, die nun beschrieben werden kann. Erfolgt nun zwischen diesem und dem vorherigen Fault ein madvise()-Aufruf, wird die page table zurückgesetzt und zeigt nun auf die Shared-Page. Der Kernel behandelt den Zugriff als reinen Lesezugriff und überspringt die Schreibrechteprüfung vollständig.
   #figure([
 ```
 follow_page_mask

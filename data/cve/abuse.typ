@@ -1,5 +1,5 @@
 == Ausnutzen der Schwachstelle
-Um die Schwachstelle auszunutzen, können wir die mmap()-Funktion verwenden, um eine Datei in den Speicher zu laden, obwohl sie lediglich über Leserechte verfügt. Da wir nicht über notwendige Berechtigungen verfügen nur ro. MAP_PRIVATE muss verwendet werden, da wir hiermit dem Betriebssystem signalisieren, dass wir eine private Kopie der Datei erstellen wollen, wenn wir versuchen diese zu beschreiben.
+Zur Ausnutzung der Schwachstelle wird die Funktion mmap() verwendet, um eine Datei in den Speicher zu laden, obwohl sie lediglich über Leserechte verfügt. Da wir nicht über notwendige Berechtigungen verfügen nur ro. MAP_PRIVATE muss verwendet werden, um dem Betriebssystem signalisieren, dass wir eine private Kopie der Datei erstellen wollen, wenn wir versuchen diese zu beschreiben.
 #figure([
 ```c
 struct stat st;

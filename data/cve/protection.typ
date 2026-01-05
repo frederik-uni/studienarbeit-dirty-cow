@@ -1,13 +1,13 @@
 == Verteidigung
 Zur Behebung der Schwachstelle wurde die zugrunde liegende Logik im Kernel angepasst. Anstatt die Schreibanforderung temporär zu entfernen, wird nun explizit ein zusätzliches Flag eingeführt, das kennzeichnet, dass sich der aktuelle Zugriff innerhalb eines COW-Kontextes befindet.
 
-Im Write Fault wird nun überprüft:
+Im Write Fault wird geprüft ob:
 - ob ein COW-Zustand aktiv ist,
 - ob der zugehörige Page Table Entry (PTE) als „dirty“ markiert ist.
 
 Basierend auf diesen Prüfungen wird entschieden, ob der Speicherbereich invalidiert werden muss. In diesem Fall wird ein erneuter Page Fault ausgelöst (Retry), wodurch eine erneute und korrekte Überprüfung der Zugriffsrechte sichergestellt wird. Dadurch wird verhindert, dass Schreiboperationen auf Shared Pages ohne explizite Schreibberechtigung durchgeführt werden können.
 
-Die Logik für die Überprüfung des ob write Permissions existieren oder wir uns in einer COW-Page befinden wurde in eine separate Funktion ausgelagert, um den Code besser lesbar und wartbar zu gestalten wie in @figure1 zu sehen. @linux_mm_remove_gup_flags_2016
+Die Logik für die Überprüfung des ob Schreibberechtigungen existieren oder wir uns in einer COW-Page befinden wurde in eine separate Funktion ausgelagert, um den Code besser lesbar und wartbar zu gestalten wie in @figure1 dargestellt. @linux_mm_remove_gup_flags_2016
 
 #figure([
 ```c
