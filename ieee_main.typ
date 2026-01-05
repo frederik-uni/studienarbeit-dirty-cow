@@ -8,7 +8,7 @@
   ],
   authors: (
     (
-      name: "Frederik Schwarz(00000000)",
+      name: "Frederik Schwarz(00514322)",
       department: [Informatik],
       organization: [Hochschule Hof],
     ),
