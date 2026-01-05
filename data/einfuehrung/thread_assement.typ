@@ -1,5 +1,6 @@
 == Wie weit verbreitet war/ist die Schwachstelle
-Dirty COW war eine äußerst kritische Schwachstelle im Linux-Kernel die über einen langen Zeitraum unentdeckt blieb. Die Schwachstelle bestand bereits in Version 2.6.22 und wurde erst in Version 4.8.3 gepatched. Dies betraf sowohl Desktop, Server als auch Android Geräte. Da dies ein Kernel Bug war betraf dies alle Linux Distributione von 2007 bis 2016. Unter anderem wurde der Exploit in the wild zum rooten von Android Geräten verwendet. @dirtycowarticle @home @android
+Dirty COW war eine äußerst kritische Schwachstelle im Kernel die über einen langen Zeitraum in ignoriert, bzw vergessen wurde. Die Schwachstelle bestand bereits in Version 2.6.22 und wurde erst in Version 4.8.3 gepatched. Dies betraf sowohl Desktop, Server als auch Android Geräte. Da dies ein Kernel Bug war betraf dies alle Linux Distributione von 2007 bis 2016. Unter anderem wurde der Exploit in the wild zum rooten von Android Geräten verwendet. @dirtycowarticle @home @android.
+Typische Anwendungsgebiete umfassen Server- und Rechenzentrumsumgebungen, in denen der Linux-Kernel aufgrund seiner hohen Stabilität, ausgeprägten Skalierbarkeit sowie weitreichenden Konfigurierbarkeit vorherrschend ist.
 
 Diese Schwachstelle war somit nicht nur theoretisch sondern wurde auch in der Praxis exlpoitet, war für lange Zeit verbreitet und hat alle Linux basierten Geräte betroffen. Somit kan man sagen das dies eine der wichtigsten Schwachstellen im Linux-Kernel war.
 

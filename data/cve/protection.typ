@@ -7,7 +7,7 @@ Im Write Fault wird nun überprüft:
 
 Basierend auf diesen Prüfungen wird entschieden, ob der Speicherbereich invalidiert werden muss. In diesem Fall wird ein erneuter Page Fault ausgelöst (Retry), wodurch eine erneute und korrekte Überprüfung der Zugriffsrechte sichergestellt wird. Dadurch wird verhindert, dass Schreiboperationen auf Shared Pages ohne explizite Schreibberechtigung durchgeführt werden können.
 
-Die Logik für die Überprüfung des COW-Zustands wurde in eine separate Funktion ausgelagert, um den Code besser lesbar und wartbar zu gestalten wie in @figure1 zu sehen. @linux_mm_remove_gup_flags_2016
+Die Logik für die Überprüfung des ob write Permissions existieren oder wir uns in einer COW-Page befinden wurde in eine separate Funktion ausgelagert, um den Code besser lesbar und wartbar zu gestalten wie in @figure1 zu sehen. @linux_mm_remove_gup_flags_2016
 
 #figure([
 ```c
@@ -22,7 +22,7 @@ static inline bool can_follow_write_pte(pte_t pte, unsigned int flags) {
 ```
 ], caption: "mm/gup.c") <figure1>
 
-Statt nur write Permissions zu überprüfen wird write oder FOLL_COW + pte_dirty überprüft.
+Statt nur write Permissions zu überprüfen wird write oder FOLL_COW + pte_dirty überprüft. Wie in @figure2 und @figure1 zu erkennen.
 
 #figure([
 ```diff
@@ -33,13 +33,13 @@ if ((flags & FOLL_NUMA) && pte_protnone(pte)) goto no_page;
         return NULL;
     }
 ```
-], caption: "mm/gup.c updated retry")
+], caption: "mm/gup.c updated retry") <figure2>
 
-Dies ist der Ursprung des Bugs. Hier wurde ursprünglich FOLL_WRITE entfernt. Statt FOLL_WRITE zu entfernen überprüfen wir nun ob wir uns in einer COW-Page befinden in dem letzten write fault.
+@figure3 ist der Ursprung des Bugs. Hier wurde ursprünglich FOLL_WRITE entfernt. Statt FOLL_WRITE zu entfernen überprüfen wir nun ob wir uns in einer COW-Page befinden wird eine neue Flag engeführt die in den eben erklärten Funktionen verwendet wird.
 #figure([
 ```diff
 if ((ret & VM_FAULT_WRITE) && !(vma->vm_flags & VM_WRITE))
 -  *flags &= ~FOLL_WRITE;
 +  *flags |= FOLL_COW;
 ```
-], caption: "mm/gup.c updated flags")
+], caption: "mm/gup.c updated flags") <figure3>

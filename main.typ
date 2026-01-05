@@ -30,11 +30,9 @@
 
 
 = Einführung
-#include("data/einfuehrung/kernel_summary.typ")
-#v(1em)
-#include("data/einfuehrung/kernel_usage.typ")
-#v(1em)
 #include("data/einfuehrung/dirty_cow.typ")
+#v(1em)
+#include("data/einfuehrung/kernel_summary.typ")
 #v(1em)
 #include("data/einfuehrung/thread_assement.typ")
 #v(1em)
