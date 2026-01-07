@@ -1,5 +1,5 @@
 == Verteidigung
-Zur Behebung der Schwachstelle wurde die zugrunde liegende Logik im Kernel angepasst. Anstatt die Schreibanforderung temporär zu entfernen, wird nun explizit ein zusätzliches Flag eingeführt, das kennzeichnet, dass sich der aktuelle Zugriff innerhalb eines COW-Kontextes befindet.
+Zur Behebung der Schwachstelle wurde die zugrunde liegende Logik im Kernel angepasst. Anstatt die Schreibanforderung temporär zu entfernen, wird nun explizit eine zusätzliche Flag eingeführt, das kennzeichnet, dass sich der aktuelle Zugriff innerhalb eines COW-Kontextes befindet.
 
 Im Write Fault wird geprüft ob:
 - ob ein COW-Zustand aktiv ist,
@@ -35,7 +35,7 @@ if ((flags & FOLL_NUMA) && pte_protnone(pte)) goto no_page;
 ```
 ], caption: [mm/gup.c updated retry]) <figure2>
 
-@figure3 ist der Ursprung des Bugs. Hier wurde ursprünglich FOLL_WRITE entfernt. Statt FOLL_WRITE zu entfernen würd überprüft ob eine COW-Page existiert und es wird eine neue Flag engeführt die in den eben erklärten Funktionen verwendet wird.
+@figure3 ist der Ursprung des Bugs. Hier wurde ursprünglich FOLL_WRITE entfernt. Statt FOLL_WRITE zu entfernen wird überprüft ob eine COW-Page existiert und es wird eine neue Flag engeführt die in den eben erklärten Funktionen verwendet wird.
 #figure([
 ```diff
 if ((ret & VM_FAULT_WRITE) && !(vma->vm_flags & VM_WRITE))

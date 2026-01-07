@@ -8,7 +8,7 @@ Entgegen vielen üblichen Schwachstellen liegt diese auf Kernel-Ebene und betrif
 
 Besonders gravierend ist die hohe Verbreitung von Linux in Serverinfrastrukturen. Dadurch kann sich das Schadenspotenzial von einem einzelnen System auf ein gesamtes Netzwerk ausweiten @linux_os.
 
-Hinsichtlich des Angriffswegs ist dieser als praxisnah zu bewerten: Bereits ein bestehender SSH-Zugang @ssh:short (siehe @fig:ssh-logo) kann ausreichen, um den Exploit auf dem Zielsystem auszuführen und eine Übernahme mit erweiterten Rechten zu ermöglichen.
+Hinsichtlich des Angriffswegs ist dieser als praxisnah zu bewerten: Bereits ein bestehender @ssh:short -Zugang (siehe @fig:ssh-logo) kann ausreichen, um den Exploit auf dem Zielsystem auszuführen und eine Übernahme mit erweiterten Rechten zu ermöglichen.
 
 #let ssh_fig = block(width: w)[
   #figure(

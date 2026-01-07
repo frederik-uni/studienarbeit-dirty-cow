@@ -1,10 +1,10 @@
 === Ursprung/Ablauf der relevanten Page Faults
-Die Analyse konzentriert sich primär auf eine annotierte Ablaufbeschreibung eines Seitenfehlers(Pagefaults) und die logische Abfolge der beteiligten Kernel-Funktionen, da der zugrunde liegende C-Code stark verschachtelt und nur schwer isoliert betrachtbar ist. Detaillierte Codeausschnitte werden lediglich dort herangezogen, wo sie für das Verständnis des Exploits oder der späteren Korrektur unmittelbar relevant sind.
+Die Analyse konzentriert sich primär auf eine annotierte Ablaufbeschreibung eines Seitenfehlers (Page Faults) und die logische Abfolge der beteiligten Kernel-Funktionen, da der zugrunde liegende C-Code stark verschachtelt und nur schwer isoliert betrachtbar ist. Detaillierte Codeausschnitte werden lediglich dort herangezogen, wo sie für das Verständnis des Exploits oder der späteren Korrektur unmittelbar relevant sind.
 
 Der Angriff basiert auf einer spezifischen Abfolge von Page Faults:
 1.	Erster Page Fault
 #block(inset: (left: 2em))[
-  Der Fault wird mit den Flags FOLL_WRITE und FOLL_FORCE ausgelöst, durch einen Schreibversuch. Da weder eine COW-Seite existiert noch Schreibrechte vorliegen, wird eine eine private anonyme Kopie der Page vorbereitet. Der interne Status wird auf read-only gesetzt, was einen weiteren Page Fault auslöst, der versucht, Schreibrechte zu erlangen @analysis.
+  Der Fault wird mit den Flags FOLL_WRITE und FOLL_FORCE ausgelöst, durch einen Schreibversuch. Da weder eine COW-Seite existiert noch Schreibrechte vorliegen, wird eine private anonyme Kopie der Page vorbereitet. Der interne Status wird auf read-only gesetzt, was einen weiteren Page Fault auslöst, der versucht, Schreibrechte zu erlangen @analysis.
   #figure([
 ```
 faultin_page
@@ -31,7 +31,7 @@ follow_page_mask
 ]
 3.	Dritter Page Fault
 #block(inset: (left: 2em))[
-  Da die COW-Seite noch nicht vollständig bereitgestellt ist, erfolgt ein erneuter Versuch, diesmal ohne erneute Prüfung der Schreibberechtigung, da davon ausgegangen wird, dass man sich weiterhin in einem gültigen COW-Zustand befindet. In dem aktuellen Page-Fault wurde erkannt, dass eine COW-Page existiert und COW-Pages sind nicht schreibgeschützt @analysis.
+  Da die COW-Seite noch nicht vollständig bereitgestellt ist, erfolgt ein erneuter Versuch, diesmal ohne erneute Prüfung der Schreibberechtigung, da davon ausgegangen wird, dass man sich weiterhin in einem gültigen COW-Zustand befindet. In dem aktuellen Page Fault wurde erkannt, dass eine COW-Page existiert und COW-Pages sind nicht schreibgeschützt @analysis.
   #figure([
 ```
 faultin_page

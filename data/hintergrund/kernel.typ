@@ -1,10 +1,10 @@
 == Kernel
 
-Eine wesentliche Rolle spielt hierbei die Implementierung von COW @cow:short @nist_rating.
+Eine wesentliche Rolle spielt hierbei die Implementierung von @cow:short @nist_rating.
 
 Im Linux-Kernel besitzt jeder Prozess einen eigenen virtuellen Adressraum. Der physische Speicher wird diesem über Seitentabellen zugeordnet. Gleichzeitig werden die Zugriffsrechte pro Speicherseite festgelegt und durchgesetzt.
 
-Zur effizienten Speichernutzung verwendet der Kernel das Copy-on-Write-Verfahren. Besonders deutlich wird das beim Betrachten der Kernel-Funktion `fork()` @pagetables. In der Praxis wird nach `fork()` meist nur auf einen kleinen Teil des Speichers geschrieben. Daher werden viele Seiten nicht kopiert und bleiben geteilt. So kann Speicher über mehrere Prozesse hinweg wiederverwendet werden, was den RAM-Verbrauch @ram:short reduziert.
+Zur effizienten Speichernutzung verwendet der Kernel das Copy-on-Write-Verfahren. Besonders deutlich wird das beim Betrachten der Kernel-Funktion `fork()` @pagetables. In der Praxis wird nach `fork()` meist nur auf einen kleinen Teil des Speichers geschrieben. Daher werden viele Seiten nicht kopiert und bleiben geteilt. So kann Speicher über mehrere Prozesse hinweg wiederverwendet werden, was den @ram:short -Verbrauch reduziert.
 
 Zusammenfassend stellt der Kernel sicher, dass kein Prozess direkt in eine schreibgeschützte Dateiabbildung schreiben kann, sondern nur in seine private Kopie.
 
@@ -21,25 +21,25 @@ In der virtuellen Speicherverwaltung des Linux-Kernels sind Page Faults zentral.
 Im Folgenden werden insbesondere Read- und Write-Page Faults betrachtet.
 
 ==== Read-Page Fault
-Ein Read-Page Fault tritt auf, wenn ein Prozess Daten von einer Seite lesen will, die nicht im RAM @ram:short präsent ist oder für die keine gültige Zuordnung besteht. Typisch ist das bei Demand Paging, da Inhalte erst bei Bedarf in den Arbeitsspeicher gemappt werden @pagefaults.
+Ein Read-Page Fault tritt auf, wenn ein Prozess Daten von einer Seite lesen will, die nicht im @ram:short präsent ist oder für die keine gültige Zuordnung besteht. Typisch ist das bei Demand Paging, da Inhalte erst bei Bedarf in den Arbeitsspeicher gemappt werden @pagefaults.
 
 ==== Write-Page Fault
-Ein Write-Page Fault tritt auf, wenn ein Prozess auf eine Seite schreiben will, die nicht präsent ist oder als schreibgeschützt markiert wurde @pagefaults. Für diese Arbeit ist besonders der Fall „write-on-read-only“ relevant: Der Prozess darf lesen, aber nicht schreiben. Der Kernel nutzt genau diesen Fall, um COW @cow:short umzusetzen.
+Ein Write-Page Fault tritt auf, wenn ein Prozess auf eine Seite schreiben will, die nicht präsent ist oder als schreibgeschützt markiert wurde @pagefaults. Für diese Arbeit ist besonders der Fall „write-on-read-only“ relevant: Der Prozess darf lesen, aber nicht schreiben. Der Kernel nutzt genau diesen Fall, um @cow:short umzusetzen.
 
 === Erläuterung COW
-Mehrere Prozesse können sich eine physische Speicherseite teilen, die zunächst schreibgeschützt ist. Versucht ein Prozess, auf diese Seite zu schreiben, löst der Kernel einen Page Fault aus. Im Page-Fault-Handler wird dann eine neue private Seite angelegt. Anschließend kopiert der Kernel den Inhalt der ursprünglichen Seite dorthin und biegt die Seitentabelle des schreibenden Prozesses auf die neue Seite um @pagefaults. Die ursprüngliche Seite bleibt unverändert. Dadurch wird die Isolation zwischen Prozessen gewährleistet @nist_rating.
+Mehrere Prozesse können sich eine physische Speicherseite teilen, die zunächst schreibgeschützt ist. Versucht ein Prozess, auf diese Seite zu schreiben, löst der Kernel einen Page Fault aus. Im Page Fault Handler wird dann eine neue private Seite angelegt. Anschließend kopiert der Kernel den Inhalt der ursprünglichen Seite dorthin und biegt die Seitentabelle des schreibenden Prozesses auf die neue Seite um @pagefaults. Die ursprüngliche Seite bleibt unverändert. Dadurch wird die Isolation zwischen Prozessen gewährleistet @nist_rating.
 
 === Scheduler und Speicherverwaltung
 Der Linux-Kernel koordiniert die CPU-Nutzung über den Scheduler und den Speicherzugriff über die virtuelle Speicherverwaltung @pagetables. Beide Bereiche hängen zusammen: Ein Prozess kann nur effektiv laufen, wenn seine benötigten Speicherseiten verfügbar sind und die Zugriffsrechte passen @scheduler.
 
 ==== Scheduler
-Der Scheduler teilt die CPU-Zeit @cpu:short zwischen Prozessen auf @scheduler. Prozesse befinden sich typischerweise in den Zuständen runnable (lauffähig, wartend), running (läuft) und blocked/sleeping (wartet, z. B. auf I/O oder Speicher).
+Der Scheduler teilt die @cpu:short -Zeit zwischen Prozessen auf @scheduler. Prozesse befinden sich typischerweise in den Zuständen runnable (lauffähig, wartend), running (läuft) und blocked/sleeping (wartet, z. B. auf I/O oder Speicher).
 
 Befindet sich ein Prozess im Zustand blocked oder sleeping, wählt der Scheduler einen anderen lauffähigen Prozess aus @scheduler. So bleibt das System reaktionsfähig.
 
 #pagebreak()
 ==== Page Table Entry
-Die Speicherverwaltung im Linux-Kernel erfolgt unter anderem über PTE @pte:short. Virtuelle Adressen werden dabei über Seitentabellen auf physische Seiten abgebildet @linux_os. Ein Page-Table Entry ist ein Seitentabelleneintrag, der das Ziel der Abbildung, die Rechte sowie Statusbits (present, accessed, dirty) definiert (siehe @fig:pte-diagramm) @pagetables.
+Die Speicherverwaltung im Linux-Kernel erfolgt unter anderem über @pte:short. Virtuelle Adressen werden dabei über Seitentabellen auf physische Seiten abgebildet @linux_os. Ein Page-Table Entry ist ein Seitentabelleneintrag, der das Ziel der Abbildung, die Rechte sowie Statusbits (present, accessed, dirty) definiert (siehe @fig:pte-diagramm) @pagetables.
 
 #set figure(supplement: [Abbildung])
 
@@ -54,9 +54,9 @@ Das Linux-Kontrollsystem basiert auf dem klassischen UNIX-/POSIX-Modell zur Zugr
 Der Kernel weist jedem Prozess eine UID (User ID) und eine oder mehrere GIDs (Group IDs) zu. Die Rechte folgen einem Klassensystem: Owner (u), Group (g) und Others (o) @permissions. In jeder Klasse gibt es die Bits read (r), write (w) und execute (x). In Verzeichnissen bedeuten diese Bits search (x), list (r) und change (w).
 
 === Pagecache Pages
-Der Page Cache erhöht die Effizienz, indem er Dateiinhalte im RAM zwischenspeichert. Dadurch werden langsame Zugriffe auf HDD oder SSD reduziert. Eine Pagecache Page ist dabei eine Speicherseite im RAM @ram:short, die einen bestimmten Abschnitt einer Datei repräsentiert.
+Der Page Cache erhöht die Effizienz, indem er Dateiinhalte im @ram:short zwischenspeichert. Dadurch werden langsame Zugriffe auf HDD oder SSD reduziert. Eine Pagecache Page ist dabei eine Speicherseite im @ram:short, die einen bestimmten Abschnitt einer Datei repräsentiert.
 
-Beim Lesen prüft der Kernel zunächst den Page Cache. Sind die Daten bereits im RAM @ram:short, handelt es sich um einen Cache Hit und der Zugriff ist schnell. Fehlen sie, liegt ein Cache Miss vor und die Daten müssen vom Datenträger nachgeladen und als neue Pagecache Page abgelegt werden.
+Beim Lesen prüft der Kernel zunächst den Page Cache. Sind die Daten bereits im @ram:short, handelt es sich um einen Cache Hit und der Zugriff ist schnell. Fehlen sie, liegt ein Cache Miss vor und die Daten müssen vom Datenträger nachgeladen und als neue Pagecache Page abgelegt werden.
 
 Für diese Arbeit ist der Page Cache bei `mmap()` @relevant besonders wichtig, da file-backed Speicherabbildungen typischerweise auf Pagecache Pages verweisen. So können viele Prozesse denselben Datenbereich parallel nutzen.
 
