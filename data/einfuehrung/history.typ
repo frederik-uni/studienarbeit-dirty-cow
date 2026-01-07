@@ -1,4 +1,4 @@
-= Warum ist das relevant ?
+= Relevanz der Schwachstelle
 
 #let w = 2.2in
 #set figure(supplement: [Abbildung])
