@@ -58,7 +58,7 @@
   #block(width: 12cm)[
     #par(justify: true)[
       #text(weight: "regular", size: 11pt)[
-        #lorem(70)
+        Diese Studienarbeit analysiert die Linux-Kernel-Schwachstelle CVE-2016-5195 oder auch bekannt als Dirty COW, eine Race Condition im Copy-on-Write-Mechanismus, die lokale Privilegieneskalation ermöglicht. Nach einer Einführung in relevante Kernelmechanismen wie Page Faults, mmap() und Copy-on-Write wird der fehlerhafte Ablauf der Speicherverwaltung detailliert nachvollzogen. Anschließend wird gezeigt, wie die Schwachstelle praktisch ausgenutzt werden kann und welche Änderungen im Kernel zur Behebung vorgenommen wurden. Ziel ist es, die Ursachen der Schwachstelle nachvollziehbar darzustellen und daraus allgemeine Erkenntnisse für sichere Kernelarchitektur abzuleiten.
       ]
     ]
   ]

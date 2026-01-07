@@ -3,25 +3,19 @@ cow:
   short: COW
   article: an
   long: Copy-on-Write
-  # todo: rewrite: https://www.graphapp.ai/engineering-glossary/containerization-orchestration/copy-on-write-cow
-  description: is a resource management technique used in container storage. It allows multiple containers to share the same base filesystem layers, only copying data when modifications are made. CoW significantly reduces storage usage and improves container startup times.
 ram:
   short: RAM
   article: the
   long: Random Access Memory
-  description: is the computer’s primary volatile working memory used to store data and instructions that the CPU needs in the short term. RAM enables fast read/write access for running programs and active processes; its contents are lost when power is removed.
 ssh:
   short: SSH
   article: the
   long: Secure Shell
-  description: is a cryptographic network protocol for secure remote access and management of systems over an insecure network. SSH provides encrypted communication, strong authentication (e.g., keys or passwords), and supports functions such as remote command execution, file transfer, and port forwarding.
 cpu:
   short: CPU
   article: the
   long: Central Processing Unit
-  description: is the primary processing component of a computer that executes program instructions and controls system operations. It performs arithmetic and logical operations, manages control flow, and coordinates with memory and peripherals to run processes and threads.
 pte:
   short: PTE
   article: the
   long: Page Table Entry
-  description: is an entry in a process’s page table that maps a virtual memory page to a physical page frame and encodes access permissions and status flags. A PTE typically contains the physical frame reference and metadata such as present, read/write, user/supervisor, accessed, dirty, and (architecture-dependent) execute-disable attributes.

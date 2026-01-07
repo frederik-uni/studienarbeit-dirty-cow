@@ -17,6 +17,11 @@
 #pagebreak()
 
 #glossary(title: "Abkürzungen")
+#v(2em)
+#outline(
+  title: "Abbildungsverzeichnis",
+  target: figure,
+)
 #pagebreak()
 #set heading(numbering: "1.")
 

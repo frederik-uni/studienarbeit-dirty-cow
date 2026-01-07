@@ -42,4 +42,4 @@ if ((ret & VM_FAULT_WRITE) && !(vma->vm_flags & VM_WRITE))
 -  *flags &= ~FOLL_WRITE;
 +  *flags |= FOLL_COW;
 ```
-], caption: [mm/gup.c updated flags linux_mm_remove_gup_flags_2016]) <figure3>
+], caption: [mm/gup.c updated flags @linux_mm_remove_gup_flags_2016]) <figure3>
