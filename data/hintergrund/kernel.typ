@@ -1,4 +1,4 @@
-== Linux Kernel
+== Kernel
 
 Eine wesentliche Rolle spielt hierbei die Implementierung von COW @cow:short @nist_rating.
 
