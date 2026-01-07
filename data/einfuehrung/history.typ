@@ -14,7 +14,7 @@ Hinsichtlich des Angriffswegs ist dieser als praxisnah zu bewerten, da bereits e
 #let ssh_fig = block(width: w)[
   #figure(
     image("media/SSH_Logo.svg", width: w),
-    caption: [#align(center)[SSH-Logo [2]]],
+    caption: [SSH-Logo [@fig:ssh-logo]],
   ) <fig:ssh-logo>
 ]
 
