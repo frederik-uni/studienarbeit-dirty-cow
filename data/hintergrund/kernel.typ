@@ -45,7 +45,7 @@ Die Speicherverwaltung unter dem Linux-Kernel erfolgt unter anderem über PTE, w
 
 #figure(
   image("media/PTE.png", width: 100%),
-  caption: [#align(center)[Übersetzung virtueller Adressen mit Page Table Entry (PTE) [2]]],
+  caption: [Übersetzung virtueller Adressen mit Page Table Entry (PTE) [@fig:pte-diagramm]],
 ) <fig:pte-diagramm>
 
 === Linux Permission System
