@@ -17,10 +17,15 @@
 #pagebreak()
 
 #glossary(title: "Abkürzungen")
-#v(2em)
+#v(1em)
 #outline(
   title: "Abbildungsverzeichnis",
-  target: figure,
+  target: figure.where(kind: image),
+)
+#v(1em)
+#outline(
+  title: "Auflistungsverzeichnis",
+  target: figure.where(kind: raw),
 )
 #pagebreak()
 #set heading(numbering: "1.")
