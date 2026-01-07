@@ -4,7 +4,7 @@ Die Analyse konzentriert sich primär auf eine annotierte Ablaufbeschreibung ein
 Der Angriff basiert auf einer spezifischen Abfolge von Page Faults:
 1.	Erster Page Fault
 #block(inset: (left: 2em))[
-  Der Fault wird mit den Flags FOLL_WRITE und FOLL_FORCE ausgelöst, durch einen Schreibversuch. Da weder eine COW-Seite existiert noch Schreibrechte vorliegen, wird eine eine private anonyme Kopie der Page vorbereitet. Der interne Status wird auf read-only gesetzt, was einen weiteren Page Fault auslöst, der versucht, Schreibrechte zu erlangen.
+  Der Fault wird mit den Flags FOLL_WRITE und FOLL_FORCE ausgelöst, durch einen Schreibversuch. Da weder eine COW-Seite existiert noch Schreibrechte vorliegen, wird eine eine private anonyme Kopie der Page vorbereitet. Der interne Status wird auf read-only gesetzt, was einen weiteren Page Fault auslöst, der versucht, Schreibrechte zu erlangen @analysis.
   #figure([
 ```
 faultin_page
@@ -16,22 +16,22 @@ faultin_page
    alloc_set_pte
      maybe_mkwrite(pte_mkdirty(entry), vma) <- mark the page dirty but keep it RO
 ```
-  ],  caption: [Page Fault 1])
+  ],  caption: [Page Fault 1 @analysis])
 ]
 2.	Zweiter Page Fault
 #block(inset: (left: 2em))[
-  Da der letzte Page Fault nicht erfolgreich war kommt zu einem weiteren Page Fault, der versucht, Schreibrechte zu erlangen.
+  Da der letzte Page Fault nicht erfolgreich war kommt zu einem weiteren Page Fault, der versucht, Schreibrechte zu erlangen @analysis.
   #figure([
 ```
 follow_page_mask
   follow_page_pte
     (flags & FOLL_WRITE) && !pte_write(pte) <- retry fault
 ```
-  ], caption: [Page Fault 2])
+  ], caption: [Page Fault 2 @analysis])
 ]
 3.	Dritter Page Fault
 #block(inset: (left: 2em))[
-  Da die COW-Seite noch nicht vollständig bereitgestellt ist, erfolgt ein erneuter Versuch, diesmal ohne erneute Prüfung der Schreibberechtigung, da davon ausgegangen wird, dass man sich weiterhin in einem gültigen COW-Zustand befindet. In dem aktuellen Page-Fault wurde erkannt, dass eine COW-Page existiert und COW-Pages sind nicht schreibgeschützt.
+  Da die COW-Seite noch nicht vollständig bereitgestellt ist, erfolgt ein erneuter Versuch, diesmal ohne erneute Prüfung der Schreibberechtigung, da davon ausgegangen wird, dass man sich weiterhin in einem gültigen COW-Zustand befindet. In dem aktuellen Page-Fault wurde erkannt, dass eine COW-Page existiert und COW-Pages sind nicht schreibgeschützt @analysis.
   #figure([
 ```
 faultin_page
@@ -47,12 +47,12 @@ faultin_page
 	      ret = VM_FAULT_WRITE
 ((ret & VM_FAULT_WRITE) && !(vma->vm_flags & VM_WRITE)) <- we drop FOLL_WRITE
 ```
-  ], caption: [Page Fault 2])
+  ], caption: [Page Fault 2 @analysis])
 ]
 
 4.	Letzter Page Fault (Read Fault)
 #block(inset: (left: 2em))[
-  Die zuvor benötigte Schreibberechtigung wurde intern entfernt. Es wird nur überprüft, ob ein read möglich ist und die Page-Cache-Seite wird zurückgegeben, die nun beschrieben werden kann. Erfolgt nun zwischen diesem und dem vorherigen Fault ein madvise()-Aufruf, wird die page table zurückgesetzt und zeigt nun auf die Shared-Page. Der Kernel behandelt den Zugriff als reinen Lesezugriff und überspringt die Schreibrechteprüfung vollständig.
+  Die zuvor benötigte Schreibberechtigung wurde intern entfernt. Es wird nur überprüft, ob ein read möglich ist und die Page-Cache-Seite wird zurückgegeben, die nun beschrieben werden kann. Erfolgt nun zwischen diesem und dem vorherigen Fault ein madvise()-Aufruf, wird die page table zurückgesetzt und zeigt nun auf die Shared-Page. Der Kernel behandelt den Zugriff als reinen Lesezugriff und überspringt die Schreibrechteprüfung vollständig @analysis.
   #figure([
 ```
 follow_page_mask
@@ -62,8 +62,7 @@ faultin_page
     __handle_mm_fault
       handle_pte_fault
         do_fault <- pte is not present
-	  do_read_fault <- this is a read fault and we will get pagecache
-	  		   page!
+	  do_read_fault <- this is a read fault and we will get pagecache page!
 ```
-], caption: [Page Fault 4(READ)])
+], caption: [Page Fault 4(READ) @analysis])
 ]

@@ -1,5 +1,5 @@
 == Ausnutzen der Schwachstelle
-Zur Ausnutzung der Schwachstelle wird die Funktion mmap() verwendet, um eine Datei in den Speicher zu laden, obwohl sie lediglich über Leserechte verfügt. Da wir nicht über notwendige Berechtigungen verfügen nur ro. MAP_PRIVATE muss verwendet werden, um dem Betriebssystem signalisieren, dass wir eine private Kopie der Datei erstellen wollen, wenn wir versuchen diese zu beschreiben.
+Zur Ausnutzung der Schwachstelle wird die Funktion mmap() verwendet, um eine Datei in den Speicher zu laden, obwohl sie lediglich über Leserechte verfügt. Da notwendige Berechtigungen nicht zur Verfügung stehen, wird die Datei als Read-Only gemappt. MAP_PRIVATE muss verwendet werden, um dem Betriebssystem signalisieren, dass eine private Kopie der Datei erstellt werden wollen, wenn versucht wird diese zu beschreiben @dirtycowpoc.
 #figure([
 ```c
 struct stat st;
@@ -7,12 +7,12 @@ int f = open(path, O_RDONLY);
 fstat(f, &st);
 void *map = mmap(NULL, st.st_size, PROT_READ, MAP_PRIVATE, f, 0);
 ```
-], caption: [mappen der Datei],
+], caption: [mappen der Datei @dirtycowpoc],
 ) \
 
 Der Exploit basiert auf dem gleichzeitigen Ausführen zweier Operationen. Zur Erhöhung der Eintrittswahrscheinlichkeit dieses Zustands werden zwei Threads gestartet, die die beiden betreffenden Operationen wiederholt ausführen.:
 1.	Schreibzugriff auf eine gemappte Pseudo-Datei
-Hierbei wird eine Datei mittels mmap() in den Speicher gemappt, obwohl sie lediglich über Leserechte verfügt. Die Verwendung einer Pseudo-Datei erlaubt es, bestimmte Sicherheitsprüfungen zu umgehen und gezielt Page Faults auszulösen, welche eine COW-Page erzeugen und beschreiben.
+Hierbei wird eine Datei mittels mmap() in den Speicher gemappt, obwohl sie lediglich über Leserechte verfügt. Die Verwendung einer Pseudo-Datei erlaubt es, bestimmte Sicherheitsprüfungen zu umgehen und gezielt Page Faults auszulösen, welche eine COW-Page erzeugen und beschreiben @dirtycowpoc.
 #figure([
 ```c
 void procselfmemThread(void *map, char *new_text, int file_offset) {
@@ -24,11 +24,11 @@ void procselfmemThread(void *map, char *new_text, int file_offset) {
   }
 }
 ```
-], caption: [beschreiben der gemappten Datei],
+], caption: [beschreiben der gemappten Datei @dirtycowpoc],
 ) \
 
 2.	madvise()-Aufruf mit MADV_DONTNEED
-Dieser Aufruf signalisiert dem Kernel, dass die aktuell verwendete COW-Seite nicht mehr benötigt wird. In der Folge wird die COW-Seite verworfen, sodass die virtuelle Adresse wieder auf die ursprüngliche, gemeinsam genutzte physische Speicherseite zeigt.
+Dieser Aufruf signalisiert dem Kernel, dass die aktuell verwendete COW-Seite nicht mehr benötigt wird. In der Folge wird die COW-Seite verworfen, sodass die virtuelle Adresse wieder auf die ursprüngliche, gemeinsam genutzte physische Speicherseite zeigt @dirtycowpoc.
 #figure([
 
 ```c
@@ -39,7 +39,7 @@ void madviseThread(void *map) {
   }
 }
 ```
-], caption: [Freigeben der COW-Page],
+], caption: [Freigeben der COW-Page @dirtycowpoc],
 ) \
 
-Wird die COW-Seite exakt zwischen dem vorletzten und dem letzten Page Fault entfernt, zeigt die virtuelle Adresse unerwartet auf die Shared Page statt auf die erwartete private Kopie. Da der letzte Page Fault lediglich ein Read-Fault ist, erfolgt keine erneute Überprüfung der Schreibberechtigung. Die Shared Page ist als „dirty“ markiert und wird zurück in die zugrunde liegende Datei geschrieben.
+Wird die COW-Seite exakt zwischen dem vorletzten und dem letzten Page Fault entfernt, zeigt die virtuelle Adresse unerwartet auf die Shared Page statt auf die erwartete private Kopie. Da der letzte Page Fault lediglich ein Read-Fault ist, erfolgt keine erneute Überprüfung der Schreibberechtigung. Die Shared Page ist als „dirty“ markiert und wird zurück in die zugrunde liegende Datei geschrieben. @analysis
