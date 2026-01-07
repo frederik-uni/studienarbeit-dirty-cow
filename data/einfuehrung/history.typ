@@ -30,6 +30,3 @@ Hinsichtlich des Angriffswegs ist dieser als praxisnah zu bewerten, da bereits e
   align: top + right,
   column-gutter: 1em,
 )
-
-
-#bibliography("refs.bib")
