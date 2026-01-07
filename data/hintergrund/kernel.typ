@@ -1,76 +1,79 @@
-
 == Linux Kernel
 
-Eine wesentliche Rolle hierbei spielt die Implementierung von COW @cow:short @nist_rating.
+Eine wesentliche Rolle spielt hierbei die Implementierung von COW @cow:short @nist_rating.
 
-Im Linux Kernel besitzt jeder Prozess einen eigenen virtuellen Adressraum. Der physische Speicher wird diesem über Seitentabellen zugeordnet, wobei zeitgleich die jeweiligen Zugriffsrechte für jede Speicherseite festgelegt und durchgesetzt werden.
+Im Linux-Kernel besitzt jeder Prozess einen eigenen virtuellen Adressraum. Der physische Speicher wird diesem über Seitentabellen zugeordnet. Gleichzeitig werden die Zugriffsrechte pro Speicherseite festgelegt und durchgesetzt.
 
-Zur effizienten Speichernutzung verwendet der Kernel das Copy-on-Write-Verfahren. Deutlich wird dies, beiu näherem Betrachten der grundlegenden Kernel-Funktion ``fork() @pagetables. Dabei kommt es in der Praxis nur selten zu einem großteiligen Schreiben auf den dafür vorgesehenen Speicherplatz. Daraufhin werden die meisten Seiten nicht kopiert und bleiben in einem geteilten Zustand, was wiederum zu einer Wiederverwendung des Speichers über mehrere Prozesse und somit zu einer Reduzierung des RAM-Verbrauch @ram:short führt.
+Zur effizienten Speichernutzung verwendet der Kernel das Copy-on-Write-Verfahren. Besonders deutlich wird das beim Betrachten der Kernel-Funktion `fork()` @pagetables. In der Praxis wird nach `fork()` meist nur auf einen kleinen Teil des Speichers geschrieben. Daher werden viele Seiten nicht kopiert und bleiben geteilt. So kann Speicher über mehrere Prozesse hinweg wiederverwendet werden, was den RAM-Verbrauch @ram:short reduziert.
 
-Zusammenfassend stellt der Kernel somit sicher, dass kein Prozess direkt in eine schreibgeschützte Dateiabbildung schreiben kann, sondern nur in seine private Kopie.
+Zusammenfassend stellt der Kernel sicher, dass kein Prozess direkt in eine schreibgeschützte Dateiabbildung schreiben kann, sondern nur in seine private Kopie.
 
-Nachfolgend möchte ich auf die Funktionsweise dieses Verfahrens eingehen.
-=== ```c fork()```
-Bei der Systemfunktion ``fork() handelt es sich um ein zentrales Element des Linux-Prozessmodells, welches zur Erzeugung eines neuen Prozesses verwendet wird @linux_kernel. Der Funktionsaufruf bewirkt eine Duplikation des aktuellen Prozesses (Elternprozess) zu einer Kopie (Kindprozess). Anschließend führen Eltern- und Kindprozess die Ausführung an der Stelle nach dem Aufruf der Funktion fort, dabei werden die beiden Prozesse anhand ihres Rückgabewertes unterschieden. Im Kindprozess gibt ``fork() 0 aus, im Elternprozess bei erfolgreicher Ausführung die PID (Prozess-ID) des Kind Prozesses und bei einem Fehler -1.
+Im Folgenden gehe ich auf die Funktionsweise dieses Verfahrens ein.
 
-Der Kernel legt anschließend eine neue interne Prozessstruktur für das Kind an und übernimmt dabei wesentliche Eigenschaften wie den virtuellen Adressraum und offene Dateideskriptoren des Elternprozesses @linux_kernel. Insbesondere ist diese Funktion entscheidend für die Speicherverwaltung, aufgrund der üblichen Verwendung von Copy-on-Write statt einer sofortigen physischen Kopie @pagetables.
+=== `fork()`
+Bei der Systemfunktion `fork()` handelt es sich um ein zentrales Element des Linux-Prozessmodells, das zur Erzeugung eines neuen Prozesses genutzt wird @linux_kernel. Der Aufruf dupliziert den aktuellen Prozess (Elternprozess) und erzeugt einen Kindprozess. Danach setzen beide Prozesse die Ausführung direkt nach dem Funktionsaufruf fort. Unterschieden werden sie über den Rückgabewert: Im Kindprozess liefert `fork()` den Wert 0, im Elternprozess bei Erfolg die PID des Kindprozesses und bei einem Fehler -1.
+
+Der Kernel legt dafür eine neue interne Prozessstruktur an und übernimmt wesentliche Eigenschaften des Elternprozesses, etwa den virtuellen Adressraum und offene Dateideskriptoren @linux_kernel. Für die Speicherverwaltung ist `fork()` besonders relevant, da typischerweise Copy-on-Write genutzt wird, statt sofort physisch zu kopieren @pagetables.
+
 === Page Faults
-In der virtuellen Speicherverwaltung des Linux Kernels sind Page Faults ein zentrales Element. Sie entstehen durch einen Zugriffsversuch eines Prozesses auf eine virtuelle Speicheradresse, wobei entweder keine gültige Abbildung existiert oder der Zugriff nicht den Zugriffsrechten entspricht @linux_kernel. Daraus folgt, dass Page Faults weniger als klassische Fehler zu betrachten sind sondern mehr als kontrollierter Mechanismus zur bedarfsgerechten Speicherzuweisung und zur Durchsetzung von Schutzgrenzen des Systems @pagefaults.
+In der virtuellen Speicherverwaltung des Linux-Kernels sind Page Faults zentral. Sie entstehen, wenn ein Prozess auf eine virtuelle Adresse zugreift, für die entweder keine gültige Abbildung existiert oder deren Zugriff nicht zu den gesetzten Rechten passt @linux_kernel. Page Faults sind daher weniger „klassische Fehler“ als ein kontrollierter Mechanismus. Sie dienen der bedarfsgerechten Speicherzuweisung und der Durchsetzung von Schutzgrenzen @pagefaults.
 
-Nachfolgend wird insbesondere auf die zwei Arten Read- und Write-Page Faults eingegangen.
+Im Folgenden werden insbesondere Read- und Write-Page Faults betrachtet.
 
 ==== Read-Page Fault
-Sobald ein Prozess Daten von einer Seite lesen will, welche noch nicht in den RAM @ram:short geladen wurde und somit nicht präsent ist oder für welche keine gültige Zuordnung besteht, entsteht ein derartiger Page Fault. Typischerweise tritt dieses Szenario bei Demand Paging auf, da bei diesem Verfahren Inhalte erst bei Bedarf in den Arbeitsspeicher gemappt werden @pagefaults.
+Ein Read-Page Fault tritt auf, wenn ein Prozess Daten von einer Seite lesen will, die nicht im RAM @ram:short präsent ist oder für die keine gültige Zuordnung besteht. Typisch ist das bei Demand Paging, da Inhalte erst bei Bedarf in den Arbeitsspeicher gemappt werden @pagefaults.
 
 ==== Write-Page Fault
-Sobald ein Prozess auf eine Seite schreiben will, welche entweder nicht präsent ist oder vorab als schreibgeschützt markiert wurde @pagefaults. Besonders relevant für diese Arbeit ist der Fall write-on-read-only, da der Prozess hierbei nur auf die Seite zugreifen aber nicht schreiben kann. Der Kernel nutzt diese Situation aktiv um das COW-Verfahren @cow:short umzusetzen.
+Ein Write-Page Fault tritt auf, wenn ein Prozess auf eine Seite schreiben will, die nicht präsent ist oder als schreibgeschützt markiert wurde @pagefaults. Für diese Arbeit ist besonders der Fall „write-on-read-only“ relevant: Der Prozess darf lesen, aber nicht schreiben. Der Kernel nutzt genau diesen Fall, um COW @cow:short umzusetzen.
 
 === Erläuterung COW
-Mehrere Prozesse können sich unter dem Kernel eine physische Speicherseite teilen, welche zunächst schreibgeschützt markiert ist. Sobald ein Prozess versucht, auf eine solche Seite zu schreiben wird vom Kernel ein Page Fault ausgelöst. Daraufhin wird im Page-Fault-Handler eine neue private Seite angelegt und der Inhalt der ursprünglichen Seite dorthin kopiert und die Seitentabelle des schreibenden Prozesses auf diese neue Seite umgelenkt @pagefaults. Dabei bleibt die ursprüngliche Seite unverändert, was eine Isolation zwischen Prozessen gewährleistet @nist_rating.
+Mehrere Prozesse können sich eine physische Speicherseite teilen, die zunächst schreibgeschützt ist. Versucht ein Prozess, auf diese Seite zu schreiben, löst der Kernel einen Page Fault aus. Im Page-Fault-Handler wird dann eine neue private Seite angelegt. Anschließend kopiert der Kernel den Inhalt der ursprünglichen Seite dorthin und biegt die Seitentabelle des schreibenden Prozesses auf die neue Seite um @pagefaults. Die ursprüngliche Seite bleibt unverändert. Dadurch wird die Isolation zwischen Prozessen gewährleistet @nist_rating.
 
 === Scheduler und Speicherverwaltung
-Der Linux-Kernel koordiniert einerseits die CPU-Nutzung durch den Scheduler und andererseits den Speicherzugriff mit Hilfe der virtuellen Speicherverwaltung @pagetables. Diese beiden Bereiche partizipieren voneinander, da ein Prozess nur effektiv laufen kann, wenn die benötigten Speicherseiten verfügbar sind und die Zugriffsrechte übereinstimmen @scheduler.
+Der Linux-Kernel koordiniert die CPU-Nutzung über den Scheduler und den Speicherzugriff über die virtuelle Speicherverwaltung @pagetables. Beide Bereiche hängen zusammen: Ein Prozess kann nur effektiv laufen, wenn seine benötigten Speicherseiten verfügbar sind und die Zugriffsrechte passen @scheduler.
 
 ==== Scheduler
-Die Rolle des Scheduler im Linux-Kernel ist die Aufteilung der CPU-Zeit @cpu:short auf Prozesse @scheduler. Derartige Prozesse befinden sich üblicherweise in den Zuständen runnable (lauffähig/wartend auf CPU), running (laufend) und blocked/sleeping (wartend auf Speicherergebnisse).
+Der Scheduler teilt die CPU-Zeit @cpu:short zwischen Prozessen auf @scheduler. Prozesse befinden sich typischerweise in den Zuständen runnable (lauffähig, wartet auf CPU), running (läuft) und blocked/sleeping (wartet, z. B. auf I/O oder Speicher).
 
-Insofern sich ein Prozess in den Zuständen blocked oder sleeping befindet, wählt der Scheduler einen lauffähigen Prozess aus @scheduler. Somit wird ein möglichst latenzfreies Arbeiten des Systems garantiert.
+Befindet sich ein Prozess im Zustand blocked oder sleeping, wählt der Scheduler einen anderen lauffähigen Prozess aus @scheduler. So bleibt das System reaktionsfähig.
 
 #pagebreak()
 ==== Page Table Entry
-Die Speicherverwaltung unter dem Linux-Kernel erfolgt unter anderem über PTE @pte:short, wobei virtuelle Adressen über Seitentabellen auf physische Seiten abgebildet werden @linux_os. Unter einem Page-Table Entry versteht man einen Seitentabelleneintrag, welcher wiederum das Ziel der Abbildung, die Rechte und die Statusbits (present, accessed, dirty) festlegt siehe @fig:pte-diagramm @pagetables.
+Die Speicherverwaltung im Linux-Kernel erfolgt unter anderem über PTE @pte:short. Virtuelle Adressen werden dabei über Seitentabellen auf physische Seiten abgebildet @linux_os. Ein Page-Table Entry ist ein Seitentabelleneintrag, der das Ziel der Abbildung, die Rechte sowie Statusbits (present, accessed, dirty) definiert (siehe @fig:pte-diagramm) @pagetables.
 
 #set figure(supplement: [Abbildung])
 
 #figure(
-  image("media/PTE.png", width: 100%),
-  caption: [Übersetzung virtueller Adressen mit Page Table Entry (PTE)],
-) <fig:pte-diagramm>
-
+image("media/PTE.png", width: 100%),
+caption: [Übersetzung virtueller Adressen mit Page Table Entry (PTE)],
+) [fig:pte-diagramm](fig:pte-diagramm)
 
 === Linux Permission System
-Das unter Linux verwendete Kontrollsystem basiert auf dem klassischen UNIX-/POSIX-Modell zur Zugriffskontrolle und reguliert, welche Prozesse auf Dateien und Verzeichnisse zugreifen dürfen @permissions. Der Kern des Systems sind hierbei Benutzer-und Gruppenidentitäten, sowie auch Rechtebits, welche bei relevanten Zugriffen überprüft werden.
+Das Linux-Kontrollsystem basiert auf dem klassischen UNIX-/POSIX-Modell zur Zugriffskontrolle. Es regelt, welche Prozesse auf Dateien und Verzeichnisse zugreifen dürfen @permissions. Grundlage sind Benutzer- und Gruppenidentitäten sowie Rechtebits, die bei Zugriffen geprüft werden.
 
-Der Kernel vergibt an jeden Prozess eine UID (User ID) und eine oder mehrere  GIDs (Group IDs). Diese genannten Rechte folgen einem Klassensystem, indem sie unter Owner (u), Group (g) und Others (o) unterteilt werden @permissions. Folglich existieren in jeder Klasse die Bits read (r), write (w), execute(x). Entgegen dessen haben diese Bits in Verzeichnissen die Bedeutung search (x), list (r) und change (w).
+Der Kernel weist jedem Prozess eine UID (User ID) und eine oder mehrere GIDs (Group IDs) zu. Die Rechte folgen einem Klassensystem: Owner (u), Group (g) und Others (o) @permissions. In jeder Klasse gibt es die Bits read (r), write (w) und execute (x). In Verzeichnissen bedeuten diese Bits search (x), list (r) und change (w).
+
 === Pagecache Pages
-Die Funktion des Page Cache im Kernel ist eine Steigerung der Effizienz, indem er Dateiinhalte im RAM zwischenspeichert und somit ineffiziente Zugriffe auf Hard Disk Drive (HDD) oder Solid State Drive (SSD) minimiert. Im Bezug darauf stellt eine Pagecache Page eine Speicherseite im RAM @ram:short dar, die einen speziellen Abschnitt einer Datei repräsentiert.
+Der Page Cache erhöht die Effizienz, indem er Dateiinhalte im RAM zwischenspeichert. Dadurch werden langsame Zugriffe auf HDD oder SSD reduziert. Eine Pagecache Page ist dabei eine Speicherseite im RAM @ram:short, die einen bestimmten Abschnitt einer Datei repräsentiert.
 
-Während des Lesevorgangs findet eine Kernel-seitige Prüfung des Page Caches statt. Insofern die Dateidaten bereits im RAM @ram:short gespeichert sind wird von einem Cache Hit gesprochen und der Zugriff erfolgt sehr schnell, falls diese fehlen wird von einem Cache Miss gesprochen und ein Nachladen der Daten von dem Datenträger ist erforderlich um sie als neue Pagecache Page abzulegen.
-Im Kontext dieser Arbeit besonders relevant ist der Page Cache bei der Funktion ``mmap() @relevant, da file-backed Speicherabbildungen üblicherweise auf Pagecache Pages verweisen und somit eine Vielzahl an Prozessen denselben Datenbereich parallel nutzen können.
+Beim Lesen prüft der Kernel zunächst den Page Cache. Sind die Daten bereits im RAM @ram:short, handelt es sich um einen Cache Hit und der Zugriff ist schnell. Fehlen sie, liegt ein Cache Miss vor und die Daten müssen vom Datenträger nachgeladen und als neue Pagecache Page abgelegt werden.
 
-Beim Schreibvorgang besteht die Möglichkeit eines Verweilens der Änderungen im Page Cache, wobei die betroffenen Pages als dirty markiert und später gebündelt auf den Datenträger zurückgeschrieben werden. Sobald eine hohe Speicherauslastung des RAMs gegeben ist, kann der Kernel Pagecache Pages wieder freigeben @relevant.
+Für diese Arbeit ist der Page Cache bei `mmap()` @relevant besonders wichtig, da file-backed Speicherabbildungen typischerweise auf Pagecache Pages verweisen. So können viele Prozesse denselben Datenbereich parallel nutzen.
 
-=== Erläuterung mmap
-Die Funktion ``mmap() unter Linux dient der Einbindung von Dateien oder Speicherbereichen in den virtuellen Adressraum eines Prozesses @relevant. Dadurch können Inhalte nicht ausschließlich über klassische Ein- und Ausgabeoperationen, sondern direkt über Speicherzugriffe verarbeitet werden.
+Beim Schreiben können Änderungen zunächst im Page Cache verbleiben. Die betroffenen Pages werden als dirty markiert und später gesammelt auf den Datenträger zurückgeschrieben. Bei hoher RAM-Auslastung kann der Kernel Pagecache Pages wieder freigeben @relevant.
 
-Im Bezug darauf unterscheidet der Kernel grundsätzlich zwischen file-backed und anonymous Speicherabbildungen. Bei file-backed Mappings wird ein definierter Bereich einer Datei in den Adressraum eingebunden und typischerweise über den Page Cache bereitgestellt. Bei anonymous Mappings hingegen besteht keine direkte Bindung an eine Datei, sodass die benötigten Speicherseiten bei Zugriff kernel-seitig bereitgestellt werden.
-Für das Zugriffsverhalten legt ``mmap() über Parameter die Rechte fest, unter anderem read, write und execute @permissions. Zusätzlich bestimmen die Flags MAP_PRIVATE und MAP_SHARED, wie Änderungen behandelt werden. Insofern MAP_SHARED verwendet wird, können Veränderungen für andere Prozesse sichtbar sein und in das zugrunde liegende Objekt zurückgeschrieben werden. Bei MAP_PRIVATE verbleiben Änderungen prozesslokal, da der Kernel das Copy-on-Write-Verfahren nutzt.
+=== Erläuterung `mmap()`
+Die Funktion `mmap()` bindet Dateien oder Speicherbereiche in den virtuellen Adressraum eines Prozesses ein @relevant. Inhalte können dadurch nicht nur über klassische I/O-Operationen, sondern direkt über Speicherzugriffe verarbeitet werden.
 
-Im Rahmen von Copy-on-Write werden file-backed Seiten zunächst häufig schreibgeschützt abgebildet. Sobald ein Prozess auf eine solche Seite schreiben möchte, wird ein Write Page Fault ausgelöst und der Kernel erzeugt eine private Kopie der betroffenen Seite für den schreibenden Prozess @relevant. Somit bleibt die ursprüngliche Datei unverändert, während der Prozess weiterhin mit einer modifizierbaren Kopie arbeiten kann.
+Der Kernel unterscheidet grundsätzlich zwischen file-backed und anonymous Speicherabbildungen. Bei file-backed Mappings wird ein definierter Bereich einer Datei eingebunden und typischerweise über den Page Cache bereitgestellt. Bei anonymous Mappings besteht keine direkte Bindung an eine Datei. Die Seiten werden bei Bedarf kernel-seitig bereitgestellt.
 
-=== Was ist eine Pseudo Datei
-Unter einer Pseudo Datei versteht man unter Linux eine Datei, die nicht als dauerhaft gespeicherter Inhalt auf einem Datenträger vorliegt, sondern kernel-seitig zur Verfügung gestellt wird. Derartige Dateien dienen vor allem dazu, interne Zustände und Informationen des Systems in einer für Benutzerprogramme zugänglichen Form darzustellen @linux_kernel. Somit handelt es sich nicht um „echte“ Dateien im klassischen Sinn, sondern um eine Schnittstelle zwischen Kernel und User Space.
+Das Zugriffsverhalten wird über Parameter festgelegt, etwa read, write und execute @permissions. Zusätzlich bestimmen die Flags MAP_PRIVATE und MAP_SHARED die Behandlung von Änderungen. Bei MAP_SHARED können Änderungen für andere Prozesse sichtbar sein und in das zugrunde liegende Objekt zurückgeschrieben werden. Bei MAP_PRIVATE bleiben Änderungen prozesslokal, da der Kernel Copy-on-Write nutzt.
 
-Pseudo Dateien treten insbesondere in virtuellen Dateisystemen wie ``/proc und ``/sys auf @relevant. Insofern ein Prozess eine solche Datei liest, liefert der Kernel dynamisch erzeugte Inhalte, beispielsweise Informationen über Prozesse, Speicherzustände oder Kernel-Parameter. Beim Schreiben auf bestimmte Pseudo Dateien kann umgekehrt eine Konfiguration oder Steuerung von Kernel-Funktionen erfolgen, sofern dies durch die jeweiligen Zugriffsrechte erlaubt ist.
+Im Rahmen von Copy-on-Write werden file-backed Seiten häufig zunächst schreibgeschützt abgebildet. Will ein Prozess darauf schreiben, löst er einen Write-Page Fault aus. Der Kernel erzeugt dann eine private Kopie der betroffenen Seite für den schreibenden Prozess @relevant. Die ursprüngliche Datei bleibt unverändert, während der Prozess mit einer modifizierbaren Kopie weiterarbeitet.
 
-Für die weitere Arbeit ist dieses Konzept relevant, da Pseudo Dateien häufig als Angriffs- oder Interaktionspunkt genutzt werden können. Ein typisches Beispiel ist ``/proc/self/mem, welches den Zugriff auf den eigenen Prozessspeicher ermöglicht und damit im Kontext kernelnaher Mechanismen eine besondere Bedeutung besitzt @relevant.
+=== Was ist eine Pseudo-Datei?
+Eine Pseudo-Datei ist unter Linux eine Datei, die nicht dauerhaft auf einem Datenträger gespeichert ist, sondern kernel-seitig bereitgestellt wird. Solche Dateien stellen interne Zustände und Systeminformationen in einer Form bereit, die für Benutzerprogramme zugänglich ist @linux_kernel. Sie sind daher keine „echten“ Dateien im klassischen Sinn, sondern eine Schnittstelle zwischen Kernel und User Space.
+
+Pseudo-Dateien finden sich insbesondere in virtuellen Dateisystemen wie `/proc` und `/sys` @relevant. Liest ein Prozess eine solche Datei, liefert der Kernel dynamisch erzeugte Inhalte, z. B. Informationen über Prozesse, Speicherzustände oder Kernel-Parameter. Beim Schreiben auf bestimmte Pseudo-Dateien können umgekehrt Kernel-Funktionen konfiguriert oder gesteuert werden, sofern die Zugriffsrechte dies erlauben.
+
+Für diese Arbeit ist das relevant, da Pseudo-Dateien als Interaktions- oder Angriffspunkt dienen können. Ein typisches Beispiel ist `/proc/self/mem`, das Zugriff auf den eigenen Prozessspeicher ermöglicht und im Kontext kernelnaher Mechanismen besonders wichtig ist @relevant.
