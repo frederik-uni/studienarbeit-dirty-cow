@@ -8,7 +8,7 @@
 #let fig = block(width: w)[
   #figure(
     image("media/Symbol-Linux Kernel.jpg", width: w),
-    caption: [#align(center)[Linux Logo [@fig:linux-logo]]],
+    caption: [Linux Logo [@fig:linux-logo]],
   ) <fig:linux-logo>
 ]
 
