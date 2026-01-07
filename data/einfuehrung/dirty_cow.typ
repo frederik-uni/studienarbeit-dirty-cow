@@ -3,7 +3,7 @@
 == Was ist Dirty COW
 #let cow = figure(
   image("../../cow.svg", width: 100%),
-  caption: [Dirty COW Logo],
+  caption: [Dirty @cow:short Logo],
 )
 #let text = [CVE-2016-5195 oder auch bekannt als \"Dirty @cow:short\", ist eine kritische Sicherheitslücke im Linux-Kernel, die 2016 entdeckt wurde@home. Die Lücke ermöglicht es einem angreifenden Benutzer, schreibbare Bereiche des Systems zu manipulieren, ohne über die notwendigen Berechtigungen zu verfügen @panic. Der Name \"Dirty @cow:short\" und das Logo (@cow) leiten sich von der Funktionsweise des @cow:both Mechanismus ab, bzw. von einer Schwachstelle des @cow:short Speichersystems und der Kernel-Funktion Dirty Bit.@offical_video @home]
 #wrap-it.wrap-content(cow, text, align: top + right)

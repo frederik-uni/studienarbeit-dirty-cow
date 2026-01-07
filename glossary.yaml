@@ -19,3 +19,6 @@ pte:
   short: PTE
   article: the
   long: Page Table Entry
+toctou:
+  short: TOCTOU
+  long: Time-of-Check to Time-of-Use
