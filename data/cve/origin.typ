@@ -16,7 +16,7 @@ faultin_page
    alloc_set_pte
      maybe_mkwrite(pte_mkdirty(entry), vma) <- mark the page dirty but keep it RO
 ```
-  ],  caption: [Page Fault 1 @analysis])
+  ],  caption: [Page Fault 1])
 ]
 2.	Zweiter Page Fault
 #block(inset: (left: 2em))[
@@ -27,7 +27,7 @@ follow_page_mask
   follow_page_pte
     (flags & FOLL_WRITE) && !pte_write(pte) <- retry fault
 ```
-  ], caption: [Page Fault 2 @analysis])
+  ], caption: [Page Fault 2])
 ]
 3.	Dritter Page Fault
 #block(inset: (left: 2em))[
@@ -47,7 +47,7 @@ faultin_page
 	      ret = VM_FAULT_WRITE
 ((ret & VM_FAULT_WRITE) && !(vma->vm_flags & VM_WRITE)) <- we drop FOLL_WRITE
 ```
-  ], caption: [Page Fault 2 @analysis])
+  ], caption: [Page Fault 2])
 ]
 
 4.	Letzter Page Fault (Read Fault)
@@ -64,5 +64,5 @@ faultin_page
         do_fault <- pte is not present
 	  do_read_fault <- this is a read fault and we will get pagecache page!
 ```
-], caption: [Page Fault 4(READ) @analysis])
+], caption: [Page Fault 4(READ)])
 ]

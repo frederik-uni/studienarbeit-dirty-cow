@@ -5,7 +5,7 @@ Ursächlich für solche Probleme ist meist die fehlende Atomarität der ausgefü
 
 #figure(
   image("../../Race-Increment.png", width: 30%),
-  caption: [Race Condition: Increment @whatracecondition],
+  caption: [Race Condition: Increment],
 ) <race>
 
 Wie in @race dargestellt, werden zwei Threads gestartet, die eine gemeinsame Variable modifizieren. Die Operation increment ist nicht atomar. Sie besteht vielmehr aus einer Sequenz von read, increment und write. Erfolgt das read des zweiten Threads, bevor der erste Thread den neuen Wert nach Abschluss seiner Operation zurückschreiben kann, lesen beide Threads denselben Anfangswert und berechnen dieselbe Aktualisierung. Dadurch wird die Variable zwar zweimal verändert, jedoch auf denselben Endwert gesetzt. Dies ist ein klassischer Fall einer verlorenen Aktualisierung (lost update).

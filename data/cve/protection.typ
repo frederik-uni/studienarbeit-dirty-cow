@@ -20,7 +20,7 @@ static inline bool can_follow_write_pte(pte_t pte, unsigned int flags) {
 		((flags & FOLL_FORCE) && (flags & FOLL_COW) && pte_dirty(pte));
 }
 ```
-], caption: [mm/gup.c @linux_mm_remove_gup_flags_2016]) <figure1>
+], caption: [mm/gup.c]) <figure1>
 
 Statt nur write Permissions zu überprüfen wird write oder FOLL_COW + pte_dirty überprüft. Wie in @figure2 und @figure1 zu erkennen.
 
@@ -33,7 +33,7 @@ if ((flags & FOLL_NUMA) && pte_protnone(pte)) goto no_page;
         return NULL;
     }
 ```
-], caption: [mm/gup.c updated retry @linux_mm_remove_gup_flags_2016]) <figure2>
+], caption: [mm/gup.c updated retry]) <figure2>
 
 @figure3 ist der Ursprung des Bugs. Hier wurde ursprünglich FOLL_WRITE entfernt. Statt FOLL_WRITE zu entfernen würd überprüft ob eine COW-Page existiert und es wird eine neue Flag engeführt die in den eben erklärten Funktionen verwendet wird.
 #figure([
@@ -42,4 +42,4 @@ if ((ret & VM_FAULT_WRITE) && !(vma->vm_flags & VM_WRITE))
 -  *flags &= ~FOLL_WRITE;
 +  *flags |= FOLL_COW;
 ```
-], caption: [mm/gup.c updated flags @linux_mm_remove_gup_flags_2016]) <figure3>
+], caption: [mm/gup.c updated flags]) <figure3>

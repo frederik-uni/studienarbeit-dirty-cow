@@ -7,7 +7,7 @@ int f = open(path, O_RDONLY);
 fstat(f, &st);
 void *map = mmap(NULL, st.st_size, PROT_READ, MAP_PRIVATE, f, 0);
 ```
-], caption: [mappen der Datei @dirtycowpoc],
+], caption: [mappen der Datei],
 ) \
 
 Der Exploit basiert auf dem gleichzeitigen Ausführen zweier Operationen. Zur Erhöhung der Eintrittswahrscheinlichkeit dieses Zustands werden zwei Threads gestartet, die die beiden betreffenden Operationen wiederholt ausführen.:
@@ -24,7 +24,7 @@ void procselfmemThread(void *map, char *new_text, int file_offset) {
   }
 }
 ```
-], caption: [beschreiben der gemappten Datei @dirtycowpoc],
+], caption: [beschreiben der gemappten Datei],
 ) \
 
 2.	madvise()-Aufruf mit MADV_DONTNEED
@@ -39,7 +39,7 @@ void madviseThread(void *map) {
   }
 }
 ```
-], caption: [Freigeben der COW-Page @dirtycowpoc],
+], caption: [Freigeben der COW-Page],
 ) \
 
 Wird die COW-Seite exakt zwischen dem vorletzten und dem letzten Page Fault entfernt, zeigt die virtuelle Adresse unerwartet auf die Shared Page statt auf die erwartete private Kopie. Da der letzte Page Fault lediglich ein Read-Fault ist, erfolgt keine erneute Überprüfung der Schreibberechtigung. Die Shared Page ist als „dirty“ markiert und wird zurück in die zugrunde liegende Datei geschrieben. @analysis

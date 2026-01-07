@@ -35,17 +35,23 @@
 #v(1em)
 = Hintergrund
 #include("data/hintergrund/privelage_escalation.typ")
-#include("data/hintergrund/linux_file_pemission.typ")
+#v(1em)
 #include("data/hintergrund/kernel.typ")
+#v(1em)
 #include("data/hintergrund/race_condition.typ")
 #v(1em)
 = CVE-2016-5195: Dirty COW
 == Details der Schwachstelle
 #include("data/cve/summary.typ")
+#v(1em)
 #include("data/cve/tec_details.typ")
+#v(1em)
 #include("data/cve/origin.typ")
+#v(1em)
 #include("data/cve/abuse.typ")
+#v(1em)
 #include("data/cve/protection.typ")
+#v(1em)
 
 = Verwandte Arbeiten
 = Fazit
