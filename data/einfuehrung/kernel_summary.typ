@@ -15,7 +15,7 @@
 #wrap-content(
   box(fig, inset: 0.25em),
   [
-    = 1.1 Was ist der Linux-Kernel 
+    = Was ist der Linux-Kernel 
 
     Im Folgenden wird der Linux-Kernel siehe @fig:linux-logo als technische Grundlage für die weitere Analyse,
     der von uns gewählten Sicherheitslücke, eingeführt.
