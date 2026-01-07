@@ -1,4 +1,4 @@
-=== Ursprung/code Analyse
+=== Ursprung/Ablauf der relevanten Page Faults
 Die Analyse konzentriert sich primär auf eine annotierte Ablaufbeschreibung eines Seitenfehlers(Pagefaults) und die logische Abfolge der beteiligten Kernel-Funktionen, da der zugrunde liegende C-Code stark verschachtelt und nur schwer isoliert betrachtbar ist. Detaillierte Codeausschnitte werden lediglich dort herangezogen, wo sie für das Verständnis des Exploits oder der späteren Korrektur unmittelbar relevant sind.
 
 Der Angriff basiert auf einer spezifischen Abfolge von Page Faults:

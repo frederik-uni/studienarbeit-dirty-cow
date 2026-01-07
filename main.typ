@@ -1,4 +1,5 @@
 #set page("a4", margin: 20mm)
+#set text(lang:"de")
 #import "@preview/glossy:0.9.0": *
 #show: init-glossary.with(yaml("glossary.yaml"))
 #include("title_page.typ")

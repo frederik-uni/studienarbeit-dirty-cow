@@ -1,6 +1,6 @@
 #import "@preview/wrap-it:0.1.1"
 
-== Warum ist das relevant ?
+== Relevanz der Schwachstelle ?
 
 #let w = 2.2in
 #set figure(supplement: [Abbildung])

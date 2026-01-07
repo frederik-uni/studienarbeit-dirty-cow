@@ -9,7 +9,7 @@ Zusammenfassend stellt der Kernel somit sicher, dass kein Prozess direkt in eine
 
 Nachfolgend möchte ich auf die Funktionsweise dieses Verfahrens eingehen.
 
-=== Die Funktion ``fork()``
+=== ```c fork()```
 Bei der Systemfunktion ``fork()`` handelt es sich um ein zentrales Element des Linux-Prozessmodells und wird zur Erzeugung eines neuen Prozesses verwendet @linux_kernel. Der Funktionsaufruf bewirkt eine Duplikation des aktuellen Prozesses (Elternprozess) zu einer Kopie (Kindprozess). Anschließend führen Eltern- und Kindprozess die Ausführung an der Stelle nach dem Aufruf der Funktion fort; dabei werden die beiden Prozesse anhand ihres Rückgabewertes unterschieden. Im Kindprozess gibt ``fork()`` 0 aus, im Elternprozess bei erfolgreicher Ausführung die PID (Prozess-ID) des Kindprozesses und bei einem Fehler -1.
 
 Der Kernel legt anschließend eine neue interne Prozessstruktur für das Kind an und übernimmt dabei wesentliche Eigenschaften wie den virtuellen Adressraum und offene Dateideskriptoren des Elternprozesses @linux_kernel. Insbesondere ist diese Funktion entscheidend für die Speicherverwaltung, aufgrund der üblichen Verwendung von Copy-on-Write statt einer sofortigen physischen Kopie @pagetables.
@@ -25,7 +25,7 @@ Sobald ein Prozess Daten von einer Seite lesen will, welche noch nicht in den RA
 ==== Write-Page Fault
 Sobald ein Prozess auf eine Seite schreiben will, welche entweder nicht präsent ist oder vorab als schreibgeschützt markiert wurde, entsteht ein derartiger Page Fault @pagefaults. Besonders relevant für diese Arbeit ist der Fall write-on-read-only, da der Prozess hierbei nur auf die Seite zugreifen, aber nicht schreiben kann. Der Kernel nutzt diese Situation aktiv, um das COW-Verfahren umzusetzen.
 
-=== Erläuterung zu COW
+=== Erläuterung COW
 Mehrere Prozesse können sich unter dem Kernel eine physische Speicherseite teilen, welche zunächst schreibgeschützt markiert ist. Sobald ein Prozess versucht, auf eine solche Seite zu schreiben, wird vom Kernel ein Page Fault ausgelöst. Daraufhin wird im Page-Fault-Handler eine neue private Seite angelegt und der Inhalt der ursprünglichen Seite dorthin kopiert und die Seitentabelle des schreibenden Prozesses auf diese neue Seite umgelenkt @pagefaults. Dabei bleibt die ursprüngliche Seite unverändert, was eine Isolation zwischen Prozessen gewährleistet @nist_rating.
 
 === Scheduler und Speicherverwaltung
@@ -61,7 +61,7 @@ Im Folgenden ist der Page Cache bei der Funktion ``mmap()`` besonders relevant @
 
 Beim Schreibvorgang besteht die Möglichkeit eines Verweilens der Änderungen im Page Cache, wobei die betroffenen Pages als dirty markiert und später gebündelt auf den Datenträger zurückgeschrieben werden. Sobald eine hohe Speicherauslastung des RAMs gegeben ist, kann der Kernel Pagecache Pages wieder freigeben @relevant.
 
-=== Erläuterung zu mmap
+=== Erläuterung mmap
 Die Funktion ``mmap()`` unter Linux dient der Einbindung von Dateien oder Speicherbereichen in den virtuellen Adressraum eines Prozesses @relevant. Dadurch können Inhalte nicht ausschließlich über klassische Ein- und Ausgabeoperationen, sondern direkt über Speicherzugriffe verarbeitet werden.
 
 In Bezug darauf unterscheidet der Kernel grundsätzlich zwischen file-backed und anonymous Speicherabbildungen. Bei file-backed Mappings wird ein definierter Bereich einer Datei in den Adressraum eingebunden und typischerweise über den Page Cache bereitgestellt. Bei anonymous Mappings hingegen besteht keine direkte Bindung an eine Datei, sodass die benötigten Speicherseiten bei Zugriff kernel-seitig bereitgestellt werden.
