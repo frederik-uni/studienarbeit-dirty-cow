@@ -46,7 +46,7 @@ Die Speicherverwaltung im Linux-Kernel erfolgt unter anderem über PTE @pte:shor
 #figure(
 image("media/PTE.png", width: 100%),
 caption: [Übersetzung virtueller Adressen mit Page Table Entry (PTE)],
-) [fig:pte-diagramm](fig:pte-diagramm)
+) <fig:pte-diagramm>
 
 === Linux Permission System
 Das Linux-Kontrollsystem basiert auf dem klassischen UNIX-/POSIX-Modell zur Zugriffskontrolle. Es regelt, welche Prozesse auf Dateien und Verzeichnisse zugreifen dürfen @permissions. Grundlage sind Benutzer- und Gruppenidentitäten sowie Rechtebits, die bei Zugriffen geprüft werden.

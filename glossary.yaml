@@ -22,3 +22,6 @@ pte:
 toctou:
   short: TOCTOU
   long: Time-of-Check to Time-of-Use
+rce:
+  short: RCE
+  long: Remote-Code-Execution

@@ -69,8 +69,9 @@
 #include("data/cve/protection.typ")
 #v(1em)
 
-= Verwandte Arbeiten
+= Verwandte CVEs
 #v(1em)
+Im Zuge der Behebung der Schwachstelle Dirty COW wurde mit CVE‑2017‑1000405 eine weitere sicherheitsrelevante Schwachstelle eingeführt, was die Fehleranfälligkeit des Kernel‑Fixes verdeutlicht @yet_another. Dirty COW ist ein lokaler Privilegieneskalations‑Exploit im COW-Mechanismus, während Dirty Pipe (CVE‑2022‑0847) einen Fehler in der Pipe‑Implementierung ausnutzt, um ebenfalls schreibgeschützte Dateien im Page Cache zu modifizieren @pipe. Obwohl Dirty COW selbst ausschließlich lokal ausnutzbar ist, steigt seine Gefährlichkeit erheblich, wenn er mit Remote‑Code‑Execution‑Exploits (@rce:short) kombiniert wird, da dadurch ein externer Angreifer zunächst beliebigen Code ausführen und anschließend durch Privilegieneskalation vollständige Systemkontrolle erlangen kann.
 = Fazit
 #v(1em)
 #include("data/fazit.typ")
