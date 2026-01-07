@@ -33,7 +33,7 @@ Mehrere Prozesse können sich eine physische Speicherseite teilen, die zunächst
 Der Linux-Kernel koordiniert die CPU-Nutzung über den Scheduler und den Speicherzugriff über die virtuelle Speicherverwaltung @pagetables. Beide Bereiche hängen zusammen: Ein Prozess kann nur effektiv laufen, wenn seine benötigten Speicherseiten verfügbar sind und die Zugriffsrechte passen @scheduler.
 
 ==== Scheduler
-Der Scheduler teilt die CPU-Zeit @cpu:short zwischen Prozessen auf @scheduler. Prozesse befinden sich typischerweise in den Zuständen runnable (lauffähig, wartet auf CPU), running (läuft) und blocked/sleeping (wartet, z. B. auf I/O oder Speicher).
+Der Scheduler teilt die CPU-Zeit @cpu:short zwischen Prozessen auf @scheduler. Prozesse befinden sich typischerweise in den Zuständen runnable (lauffähig, wartend), running (läuft) und blocked/sleeping (wartet, z. B. auf I/O oder Speicher).
 
 Befindet sich ein Prozess im Zustand blocked oder sleeping, wählt der Scheduler einen anderen lauffähigen Prozess aus @scheduler. So bleibt das System reaktionsfähig.
 
