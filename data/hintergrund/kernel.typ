@@ -1,9 +1,9 @@
 
 == Linux Kernel
 
-Im Zusammenhang mit Dirty COW (CVE-2016-5195) besonders relevant ist die Funktionsweise der Speicherverwaltung des Linux-Kernels. Eine wesentliche Rolle hierbei spielt die Implementierung von COW @cow:short @nist_rating.
+Eine wesentliche Rolle hierbei spielt die Implementierung von COW @cow:short @nist_rating.
 
-Im Linux Kernel besitzt jeder Prozess einen eigenen virtuellen Adressraum. Der physische Speicher wird diesem über Seitentabellen zugeordnet, wobei zeitgleich die jeweiligen Zugriffsrechte für jede Speicherseite festgelegt und durchgesetzt werden. 
+Im Linux Kernel besitzt jeder Prozess einen eigenen virtuellen Adressraum. Der physische Speicher wird diesem über Seitentabellen zugeordnet, wobei zeitgleich die jeweiligen Zugriffsrechte für jede Speicherseite festgelegt und durchgesetzt werden.
 
 Zur effizienten Speichernutzung verwendet der Kernel das Copy-on-Write-Verfahren. Deutlich wird dies, beiu näherem Betrachten der grundlegenden Kernel-Funktion ``fork() @pagetables. Dabei kommt es in der Praxis nur selten zu einem großteiligen Schreiben auf den dafür vorgesehenen Speicherplatz. Daraufhin werden die meisten Seiten nicht kopiert und bleiben in einem geteilten Zustand, was wiederum zu einer Wiederverwendung des Speichers über mehrere Prozesse und somit zu einer Reduzierung des RAM-Verbrauch @ram:short führt.
 
@@ -20,21 +20,21 @@ In der virtuellen Speicherverwaltung des Linux Kernels sind Page Faults ein zent
 Nachfolgend wird insbesondere auf die zwei Arten Read- und Write-Page Faults eingegangen.
 
 ==== Read-Page Fault
-Sobald ein Prozess Daten von einer Seite lesen will, welche noch nicht in den RAM @ram:short geladen wurde und somit nicht präsent ist oder für welche keine gültige Zuordnung besteht, entsteht ein derartiger Page Fault. Typischerweise tritt dieses Szenario bei Demand Paging auf, da bei diesem Verfahren Inhalte erst bei Bedarf in den Arbeitsspeicher gemappt werden @pagefaults.  
+Sobald ein Prozess Daten von einer Seite lesen will, welche noch nicht in den RAM @ram:short geladen wurde und somit nicht präsent ist oder für welche keine gültige Zuordnung besteht, entsteht ein derartiger Page Fault. Typischerweise tritt dieses Szenario bei Demand Paging auf, da bei diesem Verfahren Inhalte erst bei Bedarf in den Arbeitsspeicher gemappt werden @pagefaults.
 
 ==== Write-Page Fault
 Sobald ein Prozess auf eine Seite schreiben will, welche entweder nicht präsent ist oder vorab als schreibgeschützt markiert wurde @pagefaults. Besonders relevant für diese Arbeit ist der Fall write-on-read-only, da der Prozess hierbei nur auf die Seite zugreifen aber nicht schreiben kann. Der Kernel nutzt diese Situation aktiv um das COW-Verfahren @cow:short umzusetzen.
 
 === Erläuterung COW
-Mehrere Prozesse können sich unter dem Kernel eine physische Speicherseite teilen, welche zunächst schreibgeschützt markiert ist. Sobald ein Prozess versucht, auf eine solche Seite zu schreiben wird vom Kernel ein Page Fault ausgelöst. Daraufhin wird im Page-Fault-Handler eine neue private Seite angelegt und der Inhalt der ursprünglichen Seite dorthin kopiert und die Seitentabelle des schreibenden Prozesses auf diese neue Seite umgelenkt @pagefaults. Dabei bleibt die ursprüngliche Seite unverändert, was eine Isolation zwischen Prozessen gewährleistet @nist_rating. 
+Mehrere Prozesse können sich unter dem Kernel eine physische Speicherseite teilen, welche zunächst schreibgeschützt markiert ist. Sobald ein Prozess versucht, auf eine solche Seite zu schreiben wird vom Kernel ein Page Fault ausgelöst. Daraufhin wird im Page-Fault-Handler eine neue private Seite angelegt und der Inhalt der ursprünglichen Seite dorthin kopiert und die Seitentabelle des schreibenden Prozesses auf diese neue Seite umgelenkt @pagefaults. Dabei bleibt die ursprüngliche Seite unverändert, was eine Isolation zwischen Prozessen gewährleistet @nist_rating.
 
 === Scheduler und Speicherverwaltung
-Der Linux-Kernel koordiniert einerseits die CPU-Nutzung durch den Scheduler und andererseits den Speicherzugriff mit Hilfe der virtuellen Speicherverwaltung @pagetables. Diese beiden Bereiche partizipieren voneinander, da ein Prozess nur effektiv laufen kann, wenn die benötigten Speicherseiten verfügbar sind und die Zugriffsrechte übereinstimmen @scheduler. 
+Der Linux-Kernel koordiniert einerseits die CPU-Nutzung durch den Scheduler und andererseits den Speicherzugriff mit Hilfe der virtuellen Speicherverwaltung @pagetables. Diese beiden Bereiche partizipieren voneinander, da ein Prozess nur effektiv laufen kann, wenn die benötigten Speicherseiten verfügbar sind und die Zugriffsrechte übereinstimmen @scheduler.
 
 ==== Scheduler
 Die Rolle des Scheduler im Linux-Kernel ist die Aufteilung der CPU-Zeit @cpu:short auf Prozesse @scheduler. Derartige Prozesse befinden sich üblicherweise in den Zuständen runnable (lauffähig/wartend auf CPU), running (laufend) und blocked/sleeping (wartend auf Speicherergebnisse).
 
-Insofern sich ein Prozess in den Zuständen blocked oder sleeping befindet, wählt der Scheduler einen lauffähigen Prozess aus @scheduler. Somit wird ein möglichst latenzfreies Arbeiten des Systems garantiert. 
+Insofern sich ein Prozess in den Zuständen blocked oder sleeping befindet, wählt der Scheduler einen lauffähigen Prozess aus @scheduler. Somit wird ein möglichst latenzfreies Arbeiten des Systems garantiert.
 
 #pagebreak()
 ==== Page Table Entry
@@ -55,13 +55,13 @@ Der Kernel vergibt an jeden Prozess eine UID (User ID) und eine oder mehrere  GI
 === Pagecache Pages
 Die Funktion des Page Cache im Kernel ist eine Steigerung der Effizienz, indem er Dateiinhalte im RAM zwischenspeichert und somit ineffiziente Zugriffe auf Hard Disk Drive (HDD) oder Solid State Drive (SSD) minimiert. Im Bezug darauf stellt eine Pagecache Page eine Speicherseite im RAM @ram:short dar, die einen speziellen Abschnitt einer Datei repräsentiert.
 
-Während des Lesevorgangs findet eine Kernel-seitige Prüfung des Page Caches statt. Insofern die Dateidaten bereits im RAM @ram:short gespeichert sind wird von einem Cache Hit gesprochen und der Zugriff erfolgt sehr schnell, falls diese fehlen wird von einem Cache Miss gesprochen und ein Nachladen der Daten von dem Datenträger ist erforderlich um sie als neue Pagecache Page abzulegen.  
-Im Kontext dieser Arbeit besonders relevant ist der Page Cache bei der Funktion ``mmap() @relevant, da file-backed Speicherabbildungen üblicherweise auf Pagecache Pages verweisen und somit eine Vielzahl an Prozessen denselben Datenbereich parallel nutzen können. 
+Während des Lesevorgangs findet eine Kernel-seitige Prüfung des Page Caches statt. Insofern die Dateidaten bereits im RAM @ram:short gespeichert sind wird von einem Cache Hit gesprochen und der Zugriff erfolgt sehr schnell, falls diese fehlen wird von einem Cache Miss gesprochen und ein Nachladen der Daten von dem Datenträger ist erforderlich um sie als neue Pagecache Page abzulegen.
+Im Kontext dieser Arbeit besonders relevant ist der Page Cache bei der Funktion ``mmap() @relevant, da file-backed Speicherabbildungen üblicherweise auf Pagecache Pages verweisen und somit eine Vielzahl an Prozessen denselben Datenbereich parallel nutzen können.
 
-Beim Schreibvorgang besteht die Möglichkeit eines Verweilens der Änderungen im Page Cache, wobei die betroffenen Pages als dirty markiert und später gebündelt auf den Datenträger zurückgeschrieben werden. Sobald eine hohe Speicherauslastung des RAMs gegeben ist, kann der Kernel Pagecache Pages wieder freigeben @relevant. 
+Beim Schreibvorgang besteht die Möglichkeit eines Verweilens der Änderungen im Page Cache, wobei die betroffenen Pages als dirty markiert und später gebündelt auf den Datenträger zurückgeschrieben werden. Sobald eine hohe Speicherauslastung des RAMs gegeben ist, kann der Kernel Pagecache Pages wieder freigeben @relevant.
 
 === Erläuterung mmap
-Die Funktion ``mmap() unter Linux dient der Einbindung von Dateien oder Speicherbereichen in den virtuellen Adressraum eines Prozesses @relevant. Dadurch können Inhalte nicht ausschließlich über klassische Ein- und Ausgabeoperationen, sondern direkt über Speicherzugriffe verarbeitet werden. 
+Die Funktion ``mmap() unter Linux dient der Einbindung von Dateien oder Speicherbereichen in den virtuellen Adressraum eines Prozesses @relevant. Dadurch können Inhalte nicht ausschließlich über klassische Ein- und Ausgabeoperationen, sondern direkt über Speicherzugriffe verarbeitet werden.
 
 Im Bezug darauf unterscheidet der Kernel grundsätzlich zwischen file-backed und anonymous Speicherabbildungen. Bei file-backed Mappings wird ein definierter Bereich einer Datei in den Adressraum eingebunden und typischerweise über den Page Cache bereitgestellt. Bei anonymous Mappings hingegen besteht keine direkte Bindung an eine Datei, sodass die benötigten Speicherseiten bei Zugriff kernel-seitig bereitgestellt werden.
 Für das Zugriffsverhalten legt ``mmap() über Parameter die Rechte fest, unter anderem read, write und execute @permissions. Zusätzlich bestimmen die Flags MAP_PRIVATE und MAP_SHARED, wie Änderungen behandelt werden. Insofern MAP_SHARED verwendet wird, können Veränderungen für andere Prozesse sichtbar sein und in das zugrunde liegende Objekt zurückgeschrieben werden. Bei MAP_PRIVATE verbleiben Änderungen prozesslokal, da der Kernel das Copy-on-Write-Verfahren nutzt.
