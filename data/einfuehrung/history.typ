@@ -1,3 +1,5 @@
+
+#import "@preview/wrap-it:0.1.1"
 = Relevanz der Schwachstelle
 
 #let w = 2.2in
@@ -16,7 +18,7 @@ Hinsichtlich des Angriffswegs ist dieser als praxisnah zu bewerten, da bereits e
   ) <fig:ssh-logo>
 ]
 
-#wrap-content(
+#wrap-it.wrap-content(
   box(ssh_fig, inset: 0.25em),
   [
     Die Schwere der Schwachstelle wird zudem durch die drei IT-Sicherheitsziele untermauert.
